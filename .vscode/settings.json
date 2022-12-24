@@ -1,0 +1,5 @@
+{
+    "masmtasm.ASM.mode": "workspace",
+    "masmtasm.ASM.assembler": "MASM",
+    "masmtasm.ASM.emulator": "dosbox"
+}

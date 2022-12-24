@@ -5,6 +5,7 @@ include macros.asm;copia lo del archivo de macros
 .stack;Proporciona al procesador el tamaño de la pila.
 
 .data;Segmento donde estableces los espacios de memoria y las variables a utilizar.
+;variables auxiliares para las multiplicaciones y divisiones
 numerrr dw 2, '$'
 numerro dw 0010h, '$'
 numer2 dw 2, '$'
@@ -66,6 +67,9 @@ main PROC;Inicio de mi clase main.
     mov ds, dx
     menu;Mi metodo menu principal
 main ENDP;Fin de mi clase main.
+
+;procedimiento que convierete ascii en hexadecimales
+;en resumen revisa si son negativos o positivos y les add los 48 para que llegue  a hexa, divide en 10 y separa los numeros
 pImprimirEnteroSigno proc
     xor cx, cx
     xor di, di

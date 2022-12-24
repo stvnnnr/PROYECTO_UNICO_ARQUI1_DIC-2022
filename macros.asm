@@ -144,17 +144,17 @@ trabajoUno MACRO;macro de ingresar ecuacion
     print aceptado
 ENDM
 ;
-trabajoDos MACRO
+trabajoDos MACRO;Esta macro imprime la ecuacion almacenada, solo si son una variable, si son cero no los imprime
     limpiar
     comparaCero coeCinco, coeCuatro, coeTres, coeDos, coeUno, coeCero
 ENDM
 ;
-trabajoTres MACRO
+trabajoTres MACRO;Esta macro imprime la derivada de la ecuacion almacenada, solo si son una variable, si son cero no los imprime
     limpiar
     comparaUno coeCinco, coeCuatro, coeTres, coeDos, coeUno, coeCero
 ENDM
 ;
-trabajoCuatro MACRO
+trabajoCuatro MACRO;Esta macro imprime la integral de la ecuacion almacenada, solo si son una variable, si son cero no los imprime
     limpiar
     comparaDos coeCinco, coeCuatro, coeTres, coeDos, coeUno, coeCero
 ENDM
@@ -168,12 +168,13 @@ ENDM
 trabajoSiete MACRO
 ENDM
 ;
-comparaCero MACRO numeroUno, numeroDos, numeroTres, numeroCuatro, numeroCinco, numeroSeis
+comparaCero MACRO numeroUno, numeroDos, numeroTres, numeroCuatro, numeroCinco, numeroSeis;macro que recibe los 6 coeficientes e imprime la ecuacion almacenada
+;Creo las banderas locales para no tener problemas con las demas macros 
     LOCAL printUno, printDos, printTres, printCuatro, printCinco, printSeis, salirMacro, bandera, banderaDos, banderaTres, banderaCuatro, banderaCinco,  unoPositivo, unoNegativo, dosPositivo, dosNegativo,tresPositivo, tresNegativo, cuatroPositivo, cuatroNegativo, cincoPositivo, cincoNegativo, seisPositivo, seisNegativo, seisPositivo, seisNegativo, salirUno, salirDos, salirTres, salirCuatro, salirCinco, salirSeis, salirMacro
     print respuesta
-    cmp numeroUno, 30h
-    jne printUno
-    bandera:
+    cmp numeroUno, 30h;comparo si le numero es igual a cero
+    jne printUno;si es igual a cero no voy a la bandera, si es diferente voy a la bandera 
+    bandera:;Bandera para returns mas facil
     cmp numeroDos, 30h
     jne printDos
     banderaDos:
@@ -191,15 +192,15 @@ comparaCero MACRO numeroUno, numeroDos, numeroTres, numeroCuatro, numeroCinco, n
     jmp salirMacro
     ;----------------------------------------
     printUno:
-    cmp numeroUno, 30h
-    jg unoPositivo
-    jl unoNegativo
-    unoPositivo:
+    cmp numeroUno, 30h;comparo si el coeficient con cero para imprimirlo con signo menos o mas
+    jg unoPositivo;si es mayor que cero me voy a esta bandera
+    jl unoNegativo;si es menor que cero se va a esta bandera
+    unoPositivo:;si es mayor a cero, osea positivo imprimo el signo mas, el coeficiente y la x con su exponente
         print sigMas
         print numeroUno
         print xCinco
         jmp salirUno
-    unoNegativo:
+    unoNegativo:;si es negativo se imprime el numero con su signo y su x con su exponente
         print numeroUno
         print xCinco
     salirUno:
@@ -280,49 +281,37 @@ comparaCero MACRO numeroUno, numeroDos, numeroTres, numeroCuatro, numeroCinco, n
 ENDM
 ;
 
-multiplicacion MACRO var1, var2
-    FINIT
-    xor dx, dx
-    mov si, offset var1
-    mov dl, byte ptr[si]
-    mov si, offset numerrr
-    sub dx, 48
-    mov word ptr[si], dx
-    FILD  numerrr
+multiplicacion MACRO var1, var2;esta macro es para realizar la multiplicacion de los coeficientes con los numeros para las deviadas
+    FINIT;inicializo la fpu con su estado inicial
+    xor dx, dx;limpio los registros dx que me serviran
+    mov si, offset var1;paso la direccion de mi variable 1 que la tengo en unas variable db
+    mov dl, byte ptr[si];paso los datos de mi variable 1 al dl
+    mov si, offset numerrr;paso la direccion de mi var aux que es dw, ya que la fpu solo acepta dw
+    sub dx, 48;como las ingreso en ascii debo sumarle 48 para hacerlo hexa
+    mov word ptr[si], dx;le meto el dato ya corregido a la var dw
+    FILD  numerrr;le damos push a nuestra primera variable al fpu
 
     xor dx, dx
     mov si, offset var2
     mov dl, byte ptr[si]
     mov si, offset numerrr
     mov word ptr[si], dx
-    FILD numerrr
+    FILD numerrr;le damos push a nuestra segunda variable a la fpu
 
-    FMUL
-    FISTP numerrr
-    ; xor ax,ax
-    ; mov ax, numerrr
-    ; mov bx, numerro
-    ; div bx
-    ; add al,48
-    ; mov coco, aL
-    ; print coco
-    ; add ah,48
-    ; mov cucu, ah
-    ; print cucu
-
-    mov si, offset numerrr
-    mov bx, word ptr[si]
-    mov si, offset numer2
-    call pImprimirEnteroSigno
-    print numer2
-
-    ; ----------------------
+    FMUL;los multiplico
+    FISTP numerrr;saco el resultado de la fpu y la mando a la variable de resultado
+    
+    mov si, offset numerrr;paso la direccion de mi resultado al si
+    mov bx, word ptr[si];paso a bx mi contenido del resultado
+    mov si, offset numer2;paso mi variable de respuesta donde imprimire mi contenido convertido en hexa
+    call pImprimirEnteroSigno;llamo mi procedimiento para poder convertir mi variable ascii en hexa
+    print numer2;imprimo mi variable ya en hexa
     
     mov numerrr, '$'
     mov numer2,'$'
 ENDM
 
-comparaUno MACRO numeroUno, numeroDos, numeroTres, numeroCuatro, numeroCinco, numeroSeis
+comparaUno MACRO numeroUno, numeroDos, numeroTres, numeroCuatro, numeroCinco, numeroSeis;macro que recibe los 5 coeficientes e imprime la derivada almacenada
     LOCAL printUno, printDos, printTres, printCuatro, printCinco, printSeis, salirMacro, bandera, banderaDos, banderaTres, banderaCuatro, banderaCinco, unoPositivo, unoNegativo, dosPositivo, dosNegativo,tresPositivo, tresNegativo, cuatroPositivo, cuatroNegativo, cincoPositivo, cincoNegativo, salirUno, salirDos, salirTres, salirCuatro, salirCinco, salirMacro
     print respuesta2
     cmp numeroUno, 30h
@@ -411,7 +400,7 @@ comparaUno MACRO numeroUno, numeroDos, numeroTres, numeroCuatro, numeroCinco, nu
     salirMacro: 
 ENDM
 
-comparaDos MACRO numeroUno, numeroDos, numeroTres, numeroCuatro, numeroCinco, numeroSeis
+comparaDos MACRO numeroUno, numeroDos, numeroTres, numeroCuatro, numeroCinco, numeroSeis;macro que recibe los 5 coeficientes e imprime la integral almacenada
     LOCAL printUno, printDos, printTres, printCuatro, printCinco, printSeis, salirMacro, bandera, banderaDos, banderaTres, banderaCuatro, banderaCinco,  unoPositivo, unoNegativo, dosPositivo, dosNegativo,tresPositivo, tresNegativo, cuatroPositivo, cuatroNegativo, cincoPositivo, cincoNegativo, seisPositivo, seisNegativo, seisPositivo, seisNegativo, salirUno, salirDos, salirTres, salirCuatro, salirCinco, salirSeis, salirMacro
     print respuesta3
     cmp numeroUno, 30h
@@ -519,7 +508,7 @@ comparaDos MACRO numeroUno, numeroDos, numeroTres, numeroCuatro, numeroCinco, nu
     salirMacro: 
 ENDM
 
-division MACRO var1, var2
+division MACRO var1, var2;macro que realiza la dividion, hace lo mismo que la de multiplicacion, pero con division
     FINIT
     xor dx, dx
     mov si, offset var1

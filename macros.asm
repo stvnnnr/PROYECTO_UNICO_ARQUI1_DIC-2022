@@ -77,7 +77,7 @@ menu MACRO;macro que mantiene el menu y lo repite en loop
         limpiar
         jmp menuPrincipal
     opcionCinco:
-        trabajoCinco
+        menusSecundario
         print backMenu
         leerchar
         limpiar
@@ -113,6 +113,14 @@ textos MACRO;aca tengo todos los textos que imprimo en el menu
     print cadenaOcho
     print cadenaNueve
     print cadena
+ENDM
+textos2 MACRO;aca tengo todos los textos que imprimo en el menu
+    print menusito
+    print menusito2
+    print menusito3
+    print menusito4
+    print menusito5
+    print menusito6
 ENDM
 ;
 trabajoUno MACRO;macro de ingresar ecuacion
@@ -160,6 +168,18 @@ trabajoCuatro MACRO;Esta macro imprime la integral de la ecuacion almacenada, so
 ENDM
 ;
 trabajoCinco MACRO
+    LOCAL ciclo, SALIR
+    onVideo;prendo modo video
+    ejes;pinto mis ejes
+    impFuncion coeCinco, coeCuatro, coeTres, coeDos, coeUno, coeCero;pinto mis puntos
+    ciclo:;lo mantengo en ciclo hasta que precione esc para salir
+        MOV AH, 10H
+        INT 16h
+        CMP AL,27
+        JE SALIR
+        jmp ciclo
+    SALIR:
+    offVideo;apago el modeo video
 ENDM
 ;
 trabajoSeis MACRO
@@ -306,10 +326,34 @@ multiplicacion MACRO var1, var2;esta macro es para realizar la multiplicacion de
     mov si, offset numer2;paso mi variable de respuesta donde imprimire mi contenido convertido en hexa
     call pImprimirEnteroSigno;llamo mi procedimiento para poder convertir mi variable ascii en hexa
     print numer2;imprimo mi variable ya en hexa
-    
-    mov numerrr, '$'
-    mov numer2,'$'
 ENDM
+
+multiplicacion2 MACRO var1, var2;esta macro es para realizar la multiplicacion de los coeficientes con los numeros para las deviadas
+    FINIT;inicializo la fpu con su estado inicial
+    xor dx, dx;limpio los registros dx que me serviran
+    mov si, offset var1;paso la direccion de mi variable 1 que la tengo en unas variable db
+    mov dl, byte ptr[si];paso los datos de mi variable 1 al dl
+    mov si, offset numerrr;paso la direccion de mi var aux que es dw, ya que la fpu solo acepta dw
+    sub dx, 48;como las ingreso en ascii debo sumarle 48 para hacerlo hexa
+    mov word ptr[si], dx;le meto el dato ya corregido a la var dw
+    FILD  numerrr;le damos push a nuestra primera variable al fpu
+
+    xor dx, dx
+    mov si, offset var2
+    mov dl, byte ptr[si]
+    mov si, offset numerrr
+    mov word ptr[si], dx
+    FILD numerrr;le damos push a nuestra segunda variable a la fpu
+
+    FMUL;los multiplico
+    FISTP numerrr;saco el resultado de la fpu y la mando a la variable de resultado
+    
+    mov si, offset numerrr;paso la direccion de mi resultado al si
+    mov bx, word ptr[si];paso a bx mi contenido del resultado
+    ; mov si, offset numer2;paso mi variable de respuesta donde imprimire mi contenido convertido en hexa
+    ; call pImprimirEnteroSigno;llamo mi procedimiento para poder convertir mi variable ascii en hexa
+ENDM
+
 
 comparaUno MACRO numeroUno, numeroDos, numeroTres, numeroCuatro, numeroCinco, numeroSeis;macro que recibe los 5 coeficientes e imprime la derivada almacenada
     LOCAL printUno, printDos, printTres, printCuatro, printCinco, printSeis, salirMacro, bandera, banderaDos, banderaTres, banderaCuatro, banderaCinco, unoPositivo, unoNegativo, dosPositivo, dosNegativo,tresPositivo, tresNegativo, cuatroPositivo, cuatroNegativo, cincoPositivo, cincoNegativo, salirUno, salirDos, salirTres, salirCuatro, salirCinco, salirMacro
@@ -533,4 +577,289 @@ division MACRO var1, var2;macro que realiza la dividion, hace lo mismo que la de
     mov si, offset numer2
     call pImprimirEnteroSigno
     print numer2
+ENDM
+
+impFuncion MACRO numeroUno, numeroDos, numeroTres, numeroCuatro, numeroCinco, numeroSeis;macro que recibe los 5 coeficientes e imprime la integral almacenada
+    LOCAL printUno, printDos, printTres, printCuatro, printCinco, printSeis, salirMacro, bandera, banderaDos, banderaTres, banderaCuatro, banderaCinco,  unoPositivo, unoNegativo, dosPositivo, dosNegativo,tresPositivo, tresNegativo, cuatroPositivo, cuatroNegativo, cincoPositivo, cincoNegativo, seisPositivo, seisNegativo, seisPositivo, seisNegativo, salirUno, salirDos, salirTres, salirCuatro, salirCinco, salirSeis, salirMacro, banderin
+    mov numedos,0
+    banderin:;Recibo los numeros y comparo con 0 si son diferentes de cero, hago su funcion.
+        mov numerrrou, '$'
+        mov numerrrou, '$'
+        mov numerrrou, '$'
+        cmp numeroUno, 30h
+        jne printUno
+        bandera:
+        cmp numeroDos, 30h
+        jne printDos
+        banderaDos:
+        cmp numeroTres, 30h
+        jne printTres
+        banderaTres:
+        cmp numeroCuatro, 30h
+        jne printCuatro
+        banderaCuatro:
+        cmp numeroCinco, 30h
+        jne printCinco
+        banderaCinco:
+        cmp numeroSeis, 30h
+        jne printSeis
+        jmp salirMacro
+        ;----------------------------------------
+        printUno:
+        cmp numeroUno, 30h
+        jg unoPositivo
+        jl unoNegativo
+        unoPositivo:;multiplico el numero por el contador que llevo y luego lo sumo a mi acomulador para sacar el punto final
+            multiplicacion2 numeroUno, expo0
+            mov si, word ptr[numerrrou]
+            mov ax, word ptr[si]
+            add ax, bx
+            mov word ptr[si], ax
+            jmp salirUno
+        unoNegativo:
+            
+        salirUno:
+        jmp bandera
+        ;-------------------------
+        printDos:
+        cmp numeroDos, 30h
+        jg dosPositivo
+        jl dosNegativo
+        dosPositivo:
+            multiplicacion2 numeroDos, expo0;multiplico el numero por el contador que llevo y luego lo sumo a mi acomulador para sacar el punto final
+            mov si, word ptr[numerrrou]
+            mov ax, word ptr[si]
+            add ax, bx
+            mov word ptr[si], ax
+            jmp salirDos
+        dosNegativo:
+            
+        salirDos:
+        jmp banderaDos
+        ;-----------------------------------
+        printTres:
+        cmp numeroTres, 30h
+        jg tresPositivo
+        jl tresNegativo
+        tresPositivo:
+            multiplicacion2 numeroTres, expo0;multiplico el numero por el contador que llevo y luego lo sumo a mi acomulador para sacar el punto final
+            mov si, word ptr[numerrrou]
+            mov ax, word ptr[si]
+            add ax, bx
+            mov word ptr[si], ax
+            jmp salirTres
+        tresNegativo:
+            
+        salirTres:
+        jmp banderaTres
+        ;-------------------------
+        printCuatro:
+        cmp numeroCuatro, 30h
+        jg cuatroPositivo
+        jl cuatroNegativo
+        cuatroPositivo:
+            multiplicacion2 numeroCuatro, expo0;multiplico el numero por el contador que llevo y luego lo sumo a mi acomulador para sacar el punto final
+            mov si, word ptr[numerrrou]
+            mov ax, word ptr[si]
+            add ax, bx
+            mov word ptr[si], ax
+            jmp salirCuatro
+        cuatroNegativo:
+            
+        salirCuatro:
+        jmp banderaCuatro
+        ;--------------------------------
+        printCinco:
+        cmp numeroCinco, 30h
+        jg cincoPositivo
+        jl cincoNegativo
+        cincoPositivo:
+            multiplicacion2 numeroCinco, expo0;multiplico el numero por el contador que llevo y luego lo sumo a mi acomulador para sacar el punto final
+            mov si, word ptr[numerrrou]
+            mov ax, word ptr[si]
+            add ax, bx
+            mov word ptr[si], ax
+            jmp salirCinco
+        cincoNegativo:
+            
+        salirCinco:
+        jmp banderaCinco
+        ;-----------------------------------
+        printSeis:
+        cmp numeroSeis, 30h
+        jg seisPositivo
+        jl seisNegativo
+        seisPositivo:
+            multiplicacion2 numeroSeis, expo1;multiplico el numero por el contador que llevo y luego lo sumo a mi acomulador para sacar el punto final
+            mov si, word ptr[numerrrou]
+            mov ax, word ptr[si]
+            add ax, bx
+            mov word ptr[si], ax
+            jmp salirSeis
+        seisNegativo:
+            
+        salirSeis:
+        ; print numedos
+        ; print numerrrou
+        ; print xCinco
+        mov si, word ptr[numerrrou];recibo la suma de las multiplicaciones y le quito 36 no se porque le pone 36 pero se los quito
+        mov ax, word ptr[si]
+        sub ax, 36
+        mov word ptr[si], ax
+
+        ; mov si, offset numerrrou
+        ; mov bx, word ptr[si]
+        ; mov si, offset numedo
+        ; call pImprimirEnteroSigno
+
+        ; print numedo
+        ; mov al,04h
+        ; xor dx, dx
+        ; xor ax, ax
+        ; xor bx,bx
+        ; xor cx, cx
+
+        ; mov si, offset numedos
+        ; mov bx, word ptr[si]
+        ; mov si, offset numeTres
+        ; call pImprimirEnteroSigno
+
+        ; print numedo
+        ; print numeTres
+        ; print xSeis
+        xor dx, dx
+        xor ax, ax
+        xor bx,bx
+        xor cx, cx
+
+        mov si, word ptr[numerrrou]
+        mov ax, word ptr[si]
+        add ax, 0160h
+        mov word ptr[si], ax;le sumo 160 a la coordenada para hacerlo del centro en adelante
+
+        xor ax, ax
+
+        mov si, word ptr[numedos]
+        mov ax, word ptr[si]
+        add ax, 0100h;le sumo 100 a la coordenada para hacerlo del centro en adelante
+        mov word ptr[si], ax
+        ; -------------------------------
+        ; mov si, offset numedo
+        ; mov bx, word ptr[si]
+        ; mov si, offset numedos
+        ; call pImprimirEnteroSigno
+        ; xor dx, dx
+        ; xor ax, ax
+        ; xor bx,bx
+        ; xor cx, cx
+        ; mov si, offset numerrrou
+        ; mov bx, word ptr[si]
+        ; mov si, offset numeTres
+        ; call pImprimirEnteroSigno
+
+
+        xor dx, dx
+        xor ax, ax
+        xor bx,bx
+        xor cx, cx
+
+        mov si, word ptr[numedos]
+        mov ax, word ptr[si]
+        mov cx, ax;muevo mi coordenada x
+
+        xor ax, ax 
+
+        mov si, word ptr[numerrrou]
+        mov ax, word ptr[si]
+        mov dx, ax;muevo mi coordenada y
+        
+        xor ax, ax
+        
+        mov ah, 0ch;pongo el modeo video
+        mov al, 04h;pongo el color rojo para el punto
+        int 10h;pinto el punto
+        inc numedos
+        inc expo0
+        cmp expo0,0004h
+        jne banderin
+    salirMacro: 
+    
+ENDM
+
+ejes MACRO
+    LOCAL linea, linea2
+    xor dx,dx
+    xor cx,cx
+    xor ax,ax
+    xor bx,bx
+    mov ah,0ch
+    mov al,0fh
+    mov cx, 160
+    mov dx,0
+    int 10h
+    linea:
+        inc dx
+        int 10h
+        cmp dx,200
+        jne linea
+    mov cx, 0
+    mov dx,100
+    int 10h
+    linea2:
+        inc cx
+        int 10h
+        cmp cx,320
+        jne linea2
+ENDM
+
+onVideo MACRO
+    xor ax,ax;limpiamos los registros
+    xor bx,bx
+    xor cx,cx
+    xor dx,dx
+    mov ah,0;para activar el modo video
+    mov al,13h;que sea pantalla negra
+    int 10h; activamos el modo video
+    mov ax,0A000h;para acceder a los registros extra
+    mov es,ax
+ENDM
+
+offVideo MACRO
+    mov ax, 0003h
+    int 10h
+ENDM
+
+menusSecundario MACRO;macro que mantiene el menu y lo repite en loop
+    menuSecundario:;imprimo todas las opciones del menu
+        textos2
+        leerchar;leo el caracter que introducen
+        cmp aL, 31h;compruebo si el caracter es igual a 31h que es el codigo hexadecimal del numero 1 en ascii
+        je opcionUno2;uso el jmp equals para ver si es igual y sí si, pues entro en la etiqueta
+        cmp aL, 32h
+        je opcionDos2
+        cmp aL, 33h
+        je opcionTres2
+        cmp aL, 38h;Si eligen 8, salgo del programa
+        je salir2
+        jmp menuSecundario;vuelvo a poner el menu principal si ponen algun caracter que no es los que considere
+    opcionUno2:;etiquetas de las opciones, me manda a su macro especial
+        trabajoCinco
+        print backMenu
+        leerchar;al terminar el trabajo de la macro debo dar alguna tecla para volver al menu
+        limpiar
+        jmp menuSecundario
+    opcionDos2:
+        trabajoCinco
+        print backMenu
+        leerchar
+        limpiar
+        jmp menuSecundario
+    opcionTres2:
+        trabajoCinco
+        print backMenu
+        leerchar
+        limpiar
+        jmp menuSecundario
+    salir2:;Todo lo que va en salir es para finalizar el programa
+        limpiar
 ENDM

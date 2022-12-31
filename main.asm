@@ -7,6 +7,10 @@ include macros.asm;copia lo del archivo de macros
 .data;Segmento donde estableces los espacios de memoria y las variables a utilizar.
 ;variables auxiliares para las multiplicaciones y divisiones
 numerrr dw 2, '$'
+numerrrou dw 3, '$'
+numedo dw 3, '$'
+numedos dw 3, '$'
+numeTres dw 3, '$'
 numerro dw 0010h, '$'
 numer2 dw 2, '$'
 numer3 dw ?, '$','$','$','$','$','$'
@@ -15,6 +19,8 @@ expo5 db 0005h,'$'
 expo4 db 0004h,'$'
 expo3 db 0003h,'$'
 expo2 db 0002h,'$'
+expo1 db 0001h,'$'
+expo0 db 0000h,'$'
 ;Cadenas que me sirven para el menu
 menuTexto db 0ah,0dh,'-----------------Menu Proyecto Unico-----------------:','$'
 cadena db 0ah,0dh,'Escoje una opcion:','$'
@@ -59,6 +65,14 @@ coeDos db 2 dup(0),'$'
 coeUno db 2 dup(0),'$'
 coeCero db 2 dup(0),'$'
 
+;variables menu secundario
+menusito db 0ah,0dh,'-----------------Menu Graficas-----------------:','$'
+menusito2 db 0ah,0dh,'Escoje una opcion:','$'
+menusito3 db 0ah,0dh,'1) Graficar funcion almacenada','$'
+menusito4 db 0ah,0dh,'2) Graficar derivada de la funcion almacenada','$'
+menusito5 db 0ah,0dh,'3) Graficar integral de la funcion almacenada','$'
+menusito6 db 0ah,0dh,'8) Salir','$'
+
 
 
 .code;Segmento de todo el codigo o bien el conocido main.
@@ -66,6 +80,8 @@ main PROC;Inicio de mi clase main.
     mov dx, @DATA
     mov ds, dx
     menu;Mi metodo menu principal
+    ; onVideo
+    ; ejes
 main ENDP;Fin de mi clase main.
 
 ;procedimiento que convierete ascii en hexadecimales
